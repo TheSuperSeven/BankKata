@@ -14,7 +14,7 @@ class Account {
         this.name = name;
         this.balance = balance;
         this.threshold = threshold;
-        this.statut = this.statut;
+        this.statut = statut;
     }
 
     // Getter

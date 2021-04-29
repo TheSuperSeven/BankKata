@@ -97,13 +97,13 @@ public class Bank {
             while (rs.next())
             {
                 Account acc = new Account(rs.getString("name_account"), rs.getInt("balance"),rs.getInt("threshold"),rs.getString("statut"));
+                System.out.println(acc.toString());
                 val += acc.toString();
             }
             s.close();
         } catch (Exception e) {
             System.out.println(e.toString());
         }
-
         return val;
     }
 
