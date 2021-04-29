@@ -6,15 +6,15 @@ class Account {
     private String name;
     private Integer balance;
     private Integer threshold;
-    private Integer statut;
+    private String statut;
 
     // Constructor
 
-    public Account(String name, Integer balance, Integer threshold) {
+    public Account(String name, Integer balance, Integer threshold, String statut) {
         this.name = name;
         this.balance = balance;
         this.threshold = threshold;
-        this.statut = statut;
+        this.statut = this.statut;
     }
 
     // Getter
@@ -30,7 +30,7 @@ class Account {
         return threshold;
     }
 
-    public Integer getStatut() {return statut;}
+    public String getStatut() {return statut;}
 
     //Setter
 
@@ -46,12 +46,16 @@ class Account {
         this.threshold = threshold;
     }
 
-    public void setStatut(Integer statut) {
+    public void setStatut(String statut) {
         this.statut = statut;
     }
 
     public String toString() {
-
-        return "";
+        String statut2 = "";
+        if (this.statut.equals("f"))
+            statut2 = "false";
+        if (this.statut.equals("t"))
+            statut2 = "true";
+        return ""+name+" | "+balance+" | "+threshold+" | "+statut2+"\n";
     }
 }

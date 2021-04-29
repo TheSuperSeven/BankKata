@@ -84,7 +84,6 @@ public class Bank {
 
 
     public String printAllAccounts() {
-        Integer counter = 0;
         String val = "";
         try (Statement s = c.createStatement()) {
             // our SQL SELECT query.
@@ -97,32 +96,14 @@ public class Bank {
             // iterate through the java resultset
             while (rs.next())
             {
-                String name_account = rs.getString("name_account");
-                Integer balance = rs.getInt("balance");
-                Integer threshold = rs.getInt("threshold");
-                String statut = rs.getString("statut");
-                if(statut.equals("f"))
-                    statut = "false";
-                if(statut.equals("t"))
-                    statut = "true";
-
-
-                // print the results
-
-                System.out.format("%s, %d, %d, %s\n", name_account, balance, threshold, statut);
-                val += ""+name_account+" | "+balance+" | "+threshold+" | "+statut+ "\n";
-                counter = 1;
+                Account acc = new Account(rs.getString("name_account"), rs.getInt("balance"),rs.getInt("threshold"),rs.getString("statut"));
+                val += acc.toString();
             }
             s.close();
         } catch (Exception e) {
             System.out.println(e.toString());
         }
 
-        /* if(counter == 1){
-            return "Affichage réussi";
-        }else{
-            return "";
-        } */
         return val;
     }
 
