@@ -9,18 +9,17 @@ public class Bank {
     /*
         Strings de connection à la base postgres
      */
-    private static final String JDBC_DRIVER = "org.postgresql.Driver";
-    private static final String DB_URL = "jdbc:postgresql://localhost:5439/postgres";
-    private static final String DB_USER = "postgres";
+    // private static final String JDBC_DRIVER = "org.postgresql.Driver";
+    // private static final String DB_URL = "jdbc:postgresql://localhost:5439/postgres";
+    // private static final String DB_USER = "postgres";
 
     /*
         Strings de connection à la base mysql, à décommenter et compléter avec votre nom de bdd et de user
      */
-    // private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    // private static final String DB_URL = "jdbc:mysql://localhost:3306/bank_db";
-    // private static final String DB_USER = "bank_user";
-
-    private static final String DB_PASS = "1234";
+     private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+     private static final String DB_URL = "jdbc:mysql://localhost:3306/bankkata";
+     private static final String DB_USER = "root";
+     private static final String DB_PASS = "root";
 
     private static final String TABLE_NAME = "accounts";
 
@@ -54,35 +53,89 @@ public class Bank {
         }
     }
 
+    // Modification postgres -> mysql
     void dropAllTables() {
         try (Statement s = c.createStatement()) {
             s.executeUpdate(
-                       "DROP SCHEMA public CASCADE;" +
-                            "CREATE SCHEMA public;" +
-                            "GRANT ALL ON SCHEMA public TO postgres;" +
-                            "GRANT ALL ON SCHEMA public TO public;");
-        } catch (Exception e) {
+                    "DROP TABLE accounts;" +
+                            "CREATE TABLE accounts(`name_account` varchar(40) NOT NULL,`balance` int(11) DEFAULT '0',`threshold` int(11) NOT NULL DEFAULT '0',`statut` int(11) NOT NULL DEFAULT '0' );" +
+                            "GRANT ALL PRIVILEGES ON bankkata.accounts TO 'root'@'localhost';");}
+        catch (Exception e) {
+            System.out.println(e.toString());
+
+
+        }
+    }
+
+
+    public void createNewAccount(String name_account, int balance, int threshold) {
+        try (Statement s = c.createStatement()) {
+            s.executeUpdate(
+                    "insert into TABLE_NAME values (name_account, balance, threshold)");
+            } catch (Exception e) {
             System.out.println(e.toString());
         }
     }
 
 
-    public void createNewAccount(String name, int balance, int threshold) {
-        // TODO
-    }
-
     public String printAllAccounts() {
-        // TODO
+        Integer counter = 0;
+        try (Statement s = c.createStatement()) {
+            // our SQL SELECT query.
+            // if you only need a few columns, specify them by name instead of using "*"
+            String query = "SELECT * FROM accounts";
 
-        return "";
+            // execute the query, and get a java resultset
+            ResultSet rs = s.executeQuery(query);
+
+            // iterate through the java resultset
+            while (rs.next())
+            {
+                String name_account = rs.getString("name_account");
+                Integer balance = rs.getInt("balance");
+                Integer threshold = rs.getInt("threshold");
+                Integer statut = rs.getInt("statut");
+
+
+                // print the results
+
+                System.out.format("%s, %d, %d, %d\n", name_account, balance, threshold, statut);
+                counter = 1;
+            }
+            s.close();
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+
+        if(counter == 1){
+            return "Affichage réussi";
+        }else{
+            return "";
+        }
     }
 
-    public void changeBalanceByName(String name, int balanceModifier) {
-        // TODO
+    public void changeBalanceByName(String name_account, int balanceModifier) {
+        try (Statement s = c.createStatement()) {
+            // our SQL UPDATE query.
+            String query = "UPDATE accounts SET balance = balance + balanceModifier WHERE name_account = name_account";
+
+            s.executeQuery(query);
+
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
     }
 
-    public void blockAccount(String name) {
-        // TODO
+    public void blockAccount(String name_account) {
+        try (Statement s = c.createStatement()) {
+            // our SQL UPDATE query.
+            String query = "UPDATE accounts SET statut = 1 WHERE name_account = name_account";
+
+            s.executeQuery(query);
+
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
     }
 
     // For testing purpose
