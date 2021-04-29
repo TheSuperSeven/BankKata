@@ -57,21 +57,26 @@ public class Bank {
     void dropAllTables() {
         try (Statement s = c.createStatement()) {
             s.executeUpdate(
-                    "DROP TABLE accounts;" +
-                            "CREATE TABLE accounts(`name_account` varchar(40) NOT NULL,`balance` int(11) DEFAULT '0',`threshold` int(11) NOT NULL DEFAULT '0',`statut` int(11) NOT NULL DEFAULT '0' );" +
-                            "GRANT ALL PRIVILEGES ON bankkata.accounts TO 'root'@'localhost';");}
-        catch (Exception e) {
+                    "DROP TABLE accounts;");
+            s.executeUpdate(
+                    "CREATE TABLE accounts(`name_account` varchar(40) NOT NULL," +
+                            "`balance` int(11) DEFAULT '0'," +
+                            "`threshold` int(11) NOT NULL DEFAULT '0'," +
+                            "`statut` VARCHAR(5) DEFAULT 'f' );");
+        }catch (Exception e) {
             System.out.println(e.toString());
-
-
         }
     }
 
 
     public void createNewAccount(String name_account, int balance, int threshold) {
         try (Statement s = c.createStatement()) {
-            s.executeUpdate(
-                    "insert into TABLE_NAME values (name_account, balance, threshold)");
+            if(threshold <= 0){
+                String request = "insert into " + TABLE_NAME + " values ( '" + name_account + "'," + balance + ", " + threshold + ", 'f')";
+                int rowCount = s.executeUpdate(
+                        request);
+                System.out.println(rowCount);
+            }
             } catch (Exception e) {
             System.out.println(e.toString());
         }
@@ -80,6 +85,7 @@ public class Bank {
 
     public String printAllAccounts() {
         Integer counter = 0;
+        String val = "";
         try (Statement s = c.createStatement()) {
             // our SQL SELECT query.
             // if you only need a few columns, specify them by name instead of using "*"
@@ -94,12 +100,17 @@ public class Bank {
                 String name_account = rs.getString("name_account");
                 Integer balance = rs.getInt("balance");
                 Integer threshold = rs.getInt("threshold");
-                Integer statut = rs.getInt("statut");
+                String statut = rs.getString("statut");
+                if(statut.equals("f"))
+                    statut = "false";
+                if(statut.equals("t"))
+                    statut = "true";
 
 
                 // print the results
 
-                System.out.format("%s, %d, %d, %d\n", name_account, balance, threshold, statut);
+                System.out.format("%s, %d, %d, %s\n", name_account, balance, threshold, statut);
+                val += ""+name_account+" | "+balance+" | "+threshold+" | "+statut+ "\n";
                 counter = 1;
             }
             s.close();
@@ -107,19 +118,20 @@ public class Bank {
             System.out.println(e.toString());
         }
 
-        if(counter == 1){
+        /* if(counter == 1){
             return "Affichage réussi";
         }else{
             return "";
-        }
+        } */
+        return val;
     }
 
     public void changeBalanceByName(String name_account, int balanceModifier) {
         try (Statement s = c.createStatement()) {
             // our SQL UPDATE query.
-            String query = "UPDATE accounts SET balance = balance + balanceModifier WHERE name_account = name_account";
+            String query = "UPDATE accounts SET balance = balance + "+balanceModifier+" WHERE name_account = '"+name_account+"' AND statut = 'f' AND balance + "+balanceModifier+" > threshold";
 
-            s.executeQuery(query);
+            s.executeUpdate(query);
 
         } catch (Exception e) {
             System.out.println(e.toString());
@@ -129,9 +141,9 @@ public class Bank {
     public void blockAccount(String name_account) {
         try (Statement s = c.createStatement()) {
             // our SQL UPDATE query.
-            String query = "UPDATE accounts SET statut = 1 WHERE name_account = name_account";
-
-            s.executeQuery(query);
+            String query = "UPDATE accounts SET statut = 't' WHERE name_account = '"+name_account+"'";
+            System.out.println(query);
+            s.executeUpdate(query);
 
         } catch (Exception e) {
             System.out.println(e.toString());
